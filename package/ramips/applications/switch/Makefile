@@ -67,7 +67,7 @@ define Package/switch/install
 	$(INSTALL_DIR) $(1)/lib/network
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/switch $(1)/usr/bin
 ifeq ($(CONFIG_TARGET_ramips_mt7620),y)
-	$(INSTALL_BIN) ./files/switch-7620.sh $(1)/lib/network/switch.sh
+	$(INSTALL_BIN) ./files/switch-7620-7621.sh $(1)/lib/network/switch.sh
 endif
 ifeq ($(CONFIG_TARGET_ramips_mt7628),y)
 	$(INSTALL_BIN) ./files/switch-7628.sh $(1)/lib/network/switch.sh

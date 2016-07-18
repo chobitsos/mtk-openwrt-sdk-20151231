@@ -1,0 +1,46 @@
+Index: linux-3.10.14/net/nat/hw_nat/foe_fdb.c
+===================================================================
+--- linux-3.10.14.orig/net/nat/hw_nat/foe_fdb.c	2015-12-31 12:17:12.000000000 +0800
++++ linux-3.10.14/net/nat/hw_nat/foe_fdb.c	2016-07-18 18:45:03.000000000 +0800
+@@ -565,8 +565,12 @@
+ 	struct FoeEntry *entry;
+ 	
+ 	entry = &PpeFoeBase[entry_num];
+-	
++
++#if !defined (CONFIG_HNAT_V2)
++	entry->ipv4_hnapt.iblk2.dp = 7;
++#elif defined(CONFIG_ARCH_MT7623) || defined(CONFIG_RALINK_MT7621)
+ 	entry->ipv4_hnapt.iblk2.dp = 7;
++#endif
+ 
+ #if defined (CONFIG_HNAT_V2)
+ 	PpeSetCacheEbl(); /*clear HWNAT cache*/
+Index: linux-3.10.14/net/nat/hw_nat/ra_nat.c
+===================================================================
+--- linux-3.10.14.orig/net/nat/hw_nat/ra_nat.c	2016-07-18 18:42:55.986299874 +0800
++++ linux-3.10.14/net/nat/hw_nat/ra_nat.c	2016-07-18 18:45:54.000000000 +0800
+@@ -2581,7 +2581,9 @@
+ 	for (i=0; i<MAX_IF_NUM; i++){
+ 		if(DstPort[i] == skb->dev){
+ 			offset = i;
+-			printk("dev match offset, name=%s ifined=%x\n", skb->dev->name,i); 
++			if (DebugLevel >= 1) {
++				printk("dev match offset, name=%s ifined=%x\n", skb->dev->name,i);
++			} 
+ 		}
+ 	}
+ #endif// (CONFIG_RA_HW_NAT_WIFI_NEW_ARCH)
+@@ -3570,10 +3572,12 @@
+ 	dev=ra_dev_get_by_name("eth0");
+ 	printk("eth2 ifindex =%x\n", dev->ifindex);
+ 	DstPort[dev->ifindex] = dev;
++	DP_GMAC1 = dev->ifindex;
+ #ifdef CONFIG_RAETH_GMAC2
+ 	dev=ra_dev_get_by_name("eth1");
+ 	printk("eth2 ifindex =%x\n", dev->ifindex);
+ 	DstPort[dev->ifindex] = dev;
++	DPORT_GMAC2 = dev->ifindex;;
+ #endif
+ #else
+ 	dev=ra_dev_get_by_name("eth2");
