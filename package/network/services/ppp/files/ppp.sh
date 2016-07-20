@@ -118,7 +118,7 @@ proto_pppoe_setup() {
 	done
 
 	json_get_var mtu mtu
-	mtu="${mtu:-1492}"
+	mtu="${mtu:-1480}"
 
 	json_get_var ac ac
 	json_get_var service service
