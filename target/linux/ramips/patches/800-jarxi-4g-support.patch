@@ -1,0 +1,59 @@
+Index: linux-3.10.14/drivers/usb/serial/option.c
+===================================================================
+--- linux-3.10.14.orig/drivers/usb/serial/option.c	2016-01-08 14:06:35.000000000 +0800
++++ linux-3.10.14/drivers/usb/serial/option.c	2016-07-05 16:10:39.000000000 +0800
+@@ -84,6 +84,7 @@
+ #define HUAWEI_PRODUCT_K4505			0x1464
+ #define HUAWEI_PRODUCT_K3765			0x1465
+ #define HUAWEI_PRODUCT_K4605			0x14C6
++#define HUAWEI_PRODUCT_MU709S_2			0x1c25
+ 
+ #define QUANTA_VENDOR_ID			0x0408
+ #define QUANTA_PRODUCT_Q101			0xEA02
+@@ -94,6 +95,14 @@
+ 
+ #define NOVATELWIRELESS_VENDOR_ID		0x1410
+ 
++/*THINKWILL PRODUCTS*/
++#define THINKWILL_LTE_VENDOR_ID 0x19d2
++#define THINKWILL_PRODUCT_ML7810 0x0199 //for thinkwill ML7810-C  
++
++/*QUECTEL PRODUCTS*/
++#define QUECTEL_LTE_VENDOR_ID 0x05c6
++#define QUECTEL_PRODUCT_EC20 0x9215//for QUECTEL EC20/EC20EA-256-STD
++
+ /* YISO PRODUCTS */
+ 
+ #define YISO_VENDOR_ID				0x0EAB
+@@ -686,8 +695,9 @@
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(HUAWEI_VENDOR_ID, 0xff, 0x02, 0x7A) },
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(HUAWEI_VENDOR_ID, 0xff, 0x02, 0x7B) },
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(HUAWEI_VENDOR_ID, 0xff, 0x02, 0x7C) },
+-
+-
++	{ USB_DEVICE(HUAWEI_VENDOR_ID, HUAWEI_PRODUCT_MU709S_2) },
++	{ USB_DEVICE(THINKWILL_LTE_VENDOR_ID, THINKWILL_PRODUCT_ML7810) },//for thinkwill ML7810-C 
++	{ USB_DEVICE(QUECTEL_LTE_VENDOR_ID, QUECTEL_PRODUCT_EC20) },//for QUECTEL EC20/EC20EA-256-STD 
+ 	{ USB_DEVICE(NOVATELWIRELESS_VENDOR_ID, NOVATELWIRELESS_PRODUCT_V640) },
+ 	{ USB_DEVICE(NOVATELWIRELESS_VENDOR_ID, NOVATELWIRELESS_PRODUCT_V620) },
+ 	{ USB_DEVICE(NOVATELWIRELESS_VENDOR_ID, NOVATELWIRELESS_PRODUCT_V740) },
+Index: linux-3.10.14/drivers/usb/serial/usb_wwan.c
+===================================================================
+--- linux-3.10.14.orig/drivers/usb/serial/usb_wwan.c	2016-01-08 14:06:35.000000000 +0800
++++ linux-3.10.14/drivers/usb/serial/usb_wwan.c	2016-07-05 16:21:10.000000000 +0800
+@@ -458,7 +458,14 @@
+ 	usb_fill_bulk_urb(urb, serial->dev,
+ 			  usb_sndbulkpipe(serial->dev, endpoint) | dir,
+ 			  buf, len, callback, ctx);
+-
++	#if 1 // Added by Quectel for Zero Packet
++	if (dir == USB_DIR_OUT) {
++	struct usb_device_descriptor *desc = &serial->dev->descriptor;
++	if (desc->idVendor == 0x05C6 && (desc->idProduct == 0x9003 || desc->idProduct ==
++	0x9090 || desc->idProduct == 0x9215))
++	urb->transfer_flags |= URB_ZERO_PACKET;
++	}
++	#endif
+ 	return urb;
+ }
+ 
