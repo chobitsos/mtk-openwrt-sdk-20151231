@@ -7,7 +7,7 @@ Index: luci/themes/bootstrap/luasrc/view/themes/bootstrap/header.htm
     <div class="fill">
      <div class="container">
 -     <a class="brand" href="#"><%=hostname%></a>
-+     <a class="brand" href="#"><span style="color:yellow;padding-right: 3px;"> MediaTek </span><%=hostname%></a>
++     <a class="brand" href="http://www.jarxi.com"><span style="color:yellow;padding-right: 3px;"> JARXI </span> WIFI </a>
       <ul class="nav">
  	 <%-
  		local function submenu(prefix, node)

@@ -108,7 +108,7 @@ o:value(5, translate("Debug"))
 o:value(8, translate("Normal"))
 o:value(9, translate("Warning"))
 
-
+--[[
 --
 -- Langauge & Style
 --
@@ -132,7 +132,6 @@ function o.write(self, section, value)
 	m.uci:set("luci", "main", "lang", value)
 end
 
-
 o = s:taboption("language", ListValue, "_mediaurlbase", translate("Design"))
 for k, v in pairs(luci.config.themes) do
 	if k:sub(1, 1) ~= "." then
@@ -147,7 +146,7 @@ end
 function o.write(self, section, value)
 	m.uci:set("luci", "main", "mediaurlbase", value)
 end
-
+]]--
 
 --
 -- NTP

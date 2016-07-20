@@ -22,6 +22,7 @@ function index()
 
 	entry({"admin", "system", "admin"}, cbi("admin_system/admin"), _("Administration"), 2)
 
+	--[[
 	if nixio.fs.access("/bin/opkg") then
 		entry({"admin", "system", "packages"}, call("action_packages"), _("Software"), 10)
 		entry({"admin", "system", "packages", "ipkg"}, form("admin_system/ipkg"))
@@ -39,6 +40,7 @@ function index()
 	if nixio.fs.access("/sys/class/leds") then
 		entry({"admin", "system", "leds"}, cbi("admin_system/leds"), _("<abbr title=\"Light Emitting Diode\">LED</abbr> Configuration"), 60)
 	end
+	]]--
 
 	entry({"admin", "system", "flashops"}, call("action_flashops"), _("Backup / Flash Firmware"), 70)
 	entry({"admin", "system", "flashops", "backupfiles"}, form("admin_system/backupfiles"))

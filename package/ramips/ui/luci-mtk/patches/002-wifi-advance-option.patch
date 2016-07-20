@@ -169,10 +169,10 @@ Index: luci/modules/admin-full/luasrc/model/cbi/admin_network/wifi.lua
 +	country:value("JP")
 +	country:value("FR")
 +	country:value("TW")
-+	country:value("IE")
++	country:value("CN")
 +	country:value("HK")
 +	country:value("None")
-+	country.default = "US"
++	country.default = "CN"
 +
 +	region = s:taboption("advanced", ListValue, "region", translate("Support Channel"))
 +	region:depends("wifimode","0")
@@ -188,7 +188,7 @@ Index: luci/modules/admin-full/luasrc/model/cbi/admin_network/wifi.lua
 +	region:value("5","CH1~14")
 +	region:value("6","CH3~9")
 +	region:value("7","CH5~13")
-+	region.default = 5
++	region.default = 1
 +	aregion = s:taboption("advanced", ListValue, "aregion", translate("Support Channel"))
 +	aregion:depends("wifimode","2")
 +	aregion:depends("wifimode","6")
