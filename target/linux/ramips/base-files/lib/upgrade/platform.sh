@@ -104,6 +104,7 @@ platform_check_image() {
 	x5 |\
 	x8 |\
 	zbt-wa05 |\
+	APP03 |\
 	y1 |\
 	y1s)
 		[ "$magic" != "27051956" ] && {
