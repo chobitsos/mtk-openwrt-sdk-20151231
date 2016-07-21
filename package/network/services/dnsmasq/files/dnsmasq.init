@@ -145,6 +145,10 @@ dnsmasq() {
 	append_parm "$cfg" "dhcp_boot" "--dhcp-boot"
 	append_parm "$cfg" "local_ttl" "--local-ttl"
 
+	lanip=`uci -q get network.lan.ipaddr`
+	uci set dhcp.native.ip=$lanip
+	uci commit dhcp
+
 	config_get DOMAIN "$cfg" domain
 
 	config_get_bool ADD_LOCAL_DOMAIN "$cfg" add_local_domain 1
