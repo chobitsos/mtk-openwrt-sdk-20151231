@@ -7,7 +7,7 @@ reach=0
 
 set_dns()
 {
-    if [ $reach -ne 0 ]; then
+    if [ $reach -eq 0 ]; then
 	    if [ "$netstate" != "0" ]; then
 		    echo "address=/#/$baidu_ip" >> /etc/dnsmasq.conf
 		    echo "0" > /tmp/netstate
@@ -27,14 +27,14 @@ set_dns()
 }
 
 ping -c 2 -W 2 $baidu_ip > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+if [ $? -eq 0 ]; then
     reach=1
     set_dns
     exit 0
 fi
 
 ping -c 2 -W 2 $dns_ip > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+if [ $? -eq 0 ]; then
     reach=1
     set_dns
     exit 0
