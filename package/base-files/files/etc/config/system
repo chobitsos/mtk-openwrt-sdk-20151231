@@ -1,5 +1,5 @@
 config system
-	option hostname	JARXI
+	option hostname	APP-ROUTER
 	option timezone	CST-8
 	option zonename Asia/Shanghai
 
