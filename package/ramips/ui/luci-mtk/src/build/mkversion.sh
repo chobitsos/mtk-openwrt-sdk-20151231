@@ -22,5 +22,5 @@ end
 
 luciname    = "$variant"
 luciversion = "${5:-svn}"
-softversion = "WR.mt.bb1512.7620.1.0.0"
+softversion = "WR.mt.bb1512.7620.1.0.1"
 EOF
