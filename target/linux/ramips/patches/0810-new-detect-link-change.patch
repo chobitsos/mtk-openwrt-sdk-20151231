@@ -1,0 +1,191 @@
+Index: linux-3.10.14/drivers/net/raeth/raether.c
+===================================================================
+--- linux-3.10.14.orig/drivers/net/raeth/raether.c	2016-07-24 17:40:51.617927319 +0800
++++ linux-3.10.14/drivers/net/raeth/raether.c	2016-07-24 17:45:04.000000000 +0800
+@@ -63,69 +63,62 @@
+ #if defined (CONFIG_RALINK_DETECT_LINK)
+ #define NETLINK_USER 31
+ static struct sock *nl_raeth_detect = NULL;
+-static DECLARE_COMPLETION(detect_link_change_comp);
+-static DEFINE_SEMAPHORE(detect_link_change_mutex);
++static int detect_nl_pid = 0;
+ static char link_change_msg[128] = {0};
+ const static char *expect_msg="detect link change";
+ 
++static int detect_nl_send_to_user(char *msg)
++{
++    struct nlmsghdr *nlh;
++    struct sk_buff *skb_out;
++    int msg_size;
++    int res;
++
++    if (0 == detect_nl_pid) { return -1; }
++
++    msg_size=strlen(msg);
++    skb_out = nlmsg_new(msg_size,0);
++
++    if(!skb_out) {
++        printk(KERN_ERR "Failed to allocate new skb\n");
++        return -1;
++    }
++    nlh=nlmsg_put(skb_out,0,0,NLMSG_DONE,msg_size,0);
++    NETLINK_CB(skb_out).dst_group = 0;
++    strncpy(nlmsg_data(nlh),msg,msg_size);
++
++    res=nlmsg_unicast(nl_raeth_detect,skb_out,detect_nl_pid);
++
++    if(res<0) {
++        printk(KERN_INFO "Error while sending bak to user\n");
++    }
++
++    return res;
++}
++
+ static void detect_nl_recv_msg(struct sk_buff *skb) {
+         struct nlmsghdr *nlh;
+-        int pid;
+-        struct sk_buff *skb_out;
+-        int msg_size;
+-        int res;
+ 
+-        if (down_interruptible(&detect_link_change_mutex)) {
+-            return;
+-        }
+         //printk(KERN_INFO "Entering: %s\n", __FUNCTION__);
+ 
+         nlh=(struct nlmsghdr*)skb->data;
+-        //printk(KERN_INFO "Netlink received msg payload:%s\n",(char*)nlmsg_data(nlh));
++        printk(KERN_INFO "Netlink received msg payload:%s\n",(char*)nlmsg_data(nlh));
+         if (0 != memcmp((char*)nlmsg_data(nlh), expect_msg, strlen(expect_msg))) {
+             /* this is not expected message */
+-            up(&detect_link_change_mutex);
+             return;
+         }
+-        pid = nlh->nlmsg_pid;
+-
+-        wait_for_completion_interruptible(&detect_link_change_comp);
+-        
+-        msg_size=strlen(link_change_msg);
+-        skb_out = nlmsg_new(msg_size,0);
+-
+-        if(!skb_out)
+-        {
+-                printk(KERN_ERR "Failed to allocate new skb\n");
+-                up(&detect_link_change_mutex);
+-                return;
+-        }
+-        nlh=nlmsg_put(skb_out,0,0,NLMSG_DONE,msg_size,0);
+-        NETLINK_CB(skb_out).dst_group = 0;
+-        strncpy(nlmsg_data(nlh),link_change_msg,msg_size);
+-
+-        res=nlmsg_unicast(nl_raeth_detect,skb_out,pid);
+-
+-        if(res<0) {
+-                printk(KERN_INFO "Error while sending bak to user\n");
+-        }
+-        up(&detect_link_change_mutex);
++        detect_nl_pid = nlh->nlmsg_pid;
+ }
+ 
+ static int raeth_detect_init(void) {
+-        //struct netlink_kernel_cfg cfg;
+-        printk("Entering: %s\n",__FUNCTION__);
+-       
+         struct netlink_kernel_cfg cfg = {
+-        //cfg = 
+-        //{       
+                 .input = detect_nl_recv_msg,
+         };
+ 
++        printk("Entering: %s\n",__FUNCTION__);
++
+         nl_raeth_detect = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
+-        //nl_raeth_detect = netlink_kernel_create(&init_net, NETLINK_USER, 0, hello_nl_recv_msg,NULL,THIS_MODULE);
+-        if(!nl_raeth_detect)
+-        {
++        if(!nl_raeth_detect) {
+                 printk(KERN_ALERT "Error creating socket.\n");
+                 return -10;
+         }
+@@ -139,7 +132,6 @@
+ }
+ #endif
+ 
+-
+ #ifdef CONFIG_RAETH_NAPI
+ #if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,35)
+ static int raeth_clean(struct napi_struct *napi, int budget);
+@@ -2066,7 +2058,7 @@
+ 	link_change_msg[strlen(expect_msg)] = ' ';
+ 	link_change_msg[strlen(expect_msg) + 1] = port_no + '0';
+ 	memcpy(link_change_msg + strlen(expect_msg) + 2, " up", strlen(" up"));
+-	complete(&detect_link_change_comp);
++	detect_nl_send_to_user(link_change_msg);
+ #endif
+ 
+ #if defined (CONFIG_WAN_AT_P0)
+@@ -2080,13 +2072,14 @@
+ #endif
+     } else {	    
+ 	printk("ESW: Link Status Changed - Port%d Link Down\n", port_no);
++
+ #if defined (CONFIG_RALINK_DETECT_LINK)
+-	    memset(link_change_msg, 0, sizeof(link_change_msg) / sizeof(link_change_msg[0]));
+-	    memcpy(link_change_msg, expect_msg, strlen(expect_msg));
+-	    link_change_msg[strlen(expect_msg)] = ' ';
+-	    link_change_msg[strlen(expect_msg) + 1] = port_no + '0';
+-	    memcpy(link_change_msg + strlen(expect_msg) + 2, " down", strlen(" down"));
+-	    complete(&detect_link_change_comp);
++       memset(link_change_msg, 0, sizeof(link_change_msg) / sizeof(link_change_msg[0]));
++       memcpy(link_change_msg, expect_msg, strlen(expect_msg));
++       link_change_msg[strlen(expect_msg)] = ' ';
++       link_change_msg[strlen(expect_msg) + 1] = port_no + '0';
++       memcpy(link_change_msg + strlen(expect_msg) + 2, " down", strlen(" down"));
++       detect_nl_send_to_user(link_change_msg);
+ #endif
+     }
+ }
+@@ -6090,9 +6083,7 @@
+ 		return -ENXIO;
+ 	}
+ 
+-#if defined (CONFIG_RALINK_DETECT_LINK)
+-    raeth_detect_init();
+-#endif
++
+ #ifdef CONFIG_RAETH_NETLINK
+ 	csr_netlink_init();
+ #endif
+@@ -6102,6 +6093,11 @@
+ #ifdef CONFIG_ARCH_MT7623
+ 	mt7623_ethifsys_init();
+ #endif
++
++#if defined (CONFIG_RALINK_DETECT_LINK)
++    raeth_detect_init();
++#endif
++
+ 	return ret;
+ }
+ 
+@@ -6335,6 +6331,10 @@
+ 
+ 	ei_local = netdev_priv(dev);
+ 
++#if defined (CONFIG_RALINK_DETECT_LINK)
++    raeth_detect_exit();
++#endif
++
+ #ifdef CONFIG_PSEUDO_SUPPORT
+ 	unregister_netdev(ei_local->PseudoDev);
+ 	free_netdev(ei_local->PseudoDev);
+@@ -6347,9 +6347,6 @@
+ #ifdef CONFIG_RAETH_NETLINK
+ 	csr_netlink_end();
+ #endif
+-#if defined (CONFIG_RALINK_DETECT_LINK)
+-    raeth_detect_exit();
+-#endif
+ }
+ 
+ __attribute__((optimize("O0"))) inline void sysRegWrite(unsigned int phys, unsigned int val)
