@@ -2,12 +2,19 @@ src-git jarxipackages ssh://gitolite@192.168.120.7/jarxipackages.git
 #src-git jarxipackages /ssd/cjp/jarxipackages
 #src-git jarxipackages https://github.com/cjpthree/jarxipackages.git
 
-src-git packages https://github.com/openwrt/packages.git;for-14.07
+src-git packages ssh://gitolite@192.168.120.7/extpackages/packages.git;for-14.07
+#src-git luci ssh://gitolite@192.168.120.7/extpackages/luci.git;luci-0.12
+src-git routing ssh://gitolite@192.168.120.7/extpackages/routing.git;for-14.07
+src-git telephony ssh://gitolite@192.168.120.7/extpackages/telephony.git;for-14.07
+src-git management ssh://gitolite@192.168.120.7/extpackages/management.git;for-14.07
+src-git oldpackages ssh://gitolite@192.168.120.7/extpackages/oldpackages.git
+
+#src-git packages https://github.com/openwrt/packages.git;for-14.07
 #src-git luci https://github.com/openwrt/luci.git;luci-0.12
-src-git routing https://github.com/openwrt-routing/packages.git;for-14.07
-src-git telephony https://github.com/openwrt/telephony.git;for-14.07
-src-git management https://github.com/openwrt-management/packages.git;for-14.07
-src-git oldpackages http://git.openwrt.org/14.07/packages.git
+#src-git routing https://github.com/openwrt-routing/packages.git;for-14.07
+#src-git telephony https://github.com/openwrt/telephony.git;for-14.07
+#src-git management https://github.com/openwrt-management/packages.git;for-14.07
+#src-git oldpackages http://git.openwrt.org/14.07/packages.git
 
 #src-svn xwrt http://x-wrt.googlecode.com/svn/trunk/package
 #src-svn phone svn://svn.openwrt.org/openwrt/feeds/phone
