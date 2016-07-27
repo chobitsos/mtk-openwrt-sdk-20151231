@@ -1,5 +1,5 @@
 src-git jarxipackages ssh://gitolite@192.168.120.7/jarxipackages.git
-#src-git jarxipackages /ssd/cjp/jarxipackages
+#src-git jarxipackages /data/cjp/jarxipackages;debug
 #src-git jarxipackages https://github.com/cjpthree/jarxipackages.git
 
 src-git packages ssh://gitolite@192.168.120.7/extpackages/packages.git;for-14.07

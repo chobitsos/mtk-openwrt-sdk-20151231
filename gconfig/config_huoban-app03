@@ -2003,6 +2003,7 @@ CONFIG_PACKAGE_button-reset-app=y
 CONFIG_PACKAGE_device_auth=y
 # CONFIG_PACKAGE_helloworld is not set
 # CONFIG_PACKAGE_helloworld-havesrc is not set
+CONFIG_PACKAGE_jarxiutil=y
 CONFIG_PACKAGE_sentry=y
 CONFIG_PACKAGE_wifidogplus=y
 

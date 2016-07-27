@@ -3901,3 +3901,7 @@ msgstr "« 后退"
 
 #~ msgid "Statistics"
 #~ msgstr "统计信息"
+
+msgid "AuthDate"
+msgstr "授权期限"
+
