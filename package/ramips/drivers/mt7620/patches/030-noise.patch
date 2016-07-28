@@ -1,0 +1,122 @@
+Index: mt7620-p4rev-120998/src/chips/rt6352.c
+===================================================================
+--- mt7620-p4rev-120998.orig/src/chips/rt6352.c	2015-03-04 13:40:39.000000000 +0800
++++ mt7620-p4rev-120998/src/chips/rt6352.c	2016-07-28 16:03:15.000000000 +0800
+@@ -469,11 +469,11 @@
+ 	{BBP_R170, 0x30},
+ 	{BBP_R171, 0x30},
+ 	{BBP_R172, 0x0E},
+-	{BBP_R173, 0x0D},
++	{BBP_R173, 0x28},
+ 	{BBP_R174, 0x28},
+ 	{BBP_R175, 0x21},
+ 	{BBP_R176, 0x1C},
+-	{BBP_R177, 0x16},
++	{BBP_R177, 0x20},
+ 	{BBP_R178, 0x50},
+ 	{BBP_R179, 0x4A},
+ 	{BBP_R180, 0x43},
+Index: mt7620-p4rev-120998/src/common/rtmp_init.c
+===================================================================
+--- mt7620-p4rev-120998.orig/src/common/rtmp_init.c	2015-03-04 13:40:34.000000000 +0800
++++ mt7620-p4rev-120998/src/common/rtmp_init.c	2016-07-28 16:04:42.000000000 +0800
+@@ -120,7 +120,7 @@
+ 	/*{TX_RTY_CFG,			0x6bb80408},	 Jan, 2006/11/16*/
+ /* WMM_ACM_SUPPORT*/
+ /*	{TX_RTY_CFG,			0x6bb80101},	 sample*/
+-	{TX_RTY_CFG,			0x47d01f0f},	/* Jan, 2006/11/16, Set TxWI->ACK =0 in Probe Rsp Modify for 2860E ,2007-08-03*/
++	{TX_RTY_CFG,			0x40641f0f},	/* Jan, 2006/11/16, Set TxWI->ACK =0 in Probe Rsp Modify for 2860E ,2007-08-03*/
+ 	
+ 	{AUTO_RSP_CFG,			0x00000013},	/* Initial Auto_Responder, because QA will turn off Auto-Responder*/
+ 	{CCK_PROT_CFG,			0x05740003 /*0x01740003*/},	/* Initial Auto_Responder, because QA will turn off Auto-Responder. And RTS threshold is enabled. */
+@@ -132,7 +132,7 @@
+ 	{MM40_PROT_CFG,			0x03F54084},	
+ #endif /* RTMP_MAC_PCI */
+ 	{TXOP_CTRL_CFG,			0x0000583f, /*0x0000243f*/ /*0x000024bf*/},	/*Extension channel backoff.*/
+-	{TX_RTS_CFG,			0x00092b20},	
++	{TX_RTS_CFG,			0x00092b05},	
+ 
+ 	{EXP_ACK_TIME,			0x002400ca},	/* default value */
+ 	{TXOP_HLDR_ET, 			0x00000002},
+Index: mt7620-p4rev-120998/src/common/rtmp_init_inf.c
+===================================================================
+--- mt7620-p4rev-120998.orig/src/common/rtmp_init_inf.c	2015-03-04 13:40:34.000000000 +0800
++++ mt7620-p4rev-120998/src/common/rtmp_init_inf.c	2016-07-28 16:03:41.000000000 +0800
+@@ -657,9 +657,13 @@
+ 				RTMP_BBP_IO_WRITE8_BY_REG_ID(pAd, BBP_R195, 0x86);
+ 				RTMP_BBP_IO_WRITE8_BY_REG_ID(pAd, BBP_R196, 0x70);
+ 				RTMP_BBP_IO_WRITE8_BY_REG_ID(pAd, BBP_R195, 0x9c);
+-				RTMP_BBP_IO_WRITE8_BY_REG_ID(pAd, BBP_R196, 0x27);
++				RTMP_BBP_IO_WRITE8_BY_REG_ID(pAd, BBP_R196, 0x3D);
+ 				RTMP_BBP_IO_WRITE8_BY_REG_ID(pAd, BBP_R195, 0x9d);
+-				RTMP_BBP_IO_WRITE8_BY_REG_ID(pAd, BBP_R196, 0x27);
++                                if (pAd->CommonCfg.BBPCurrentBW == BW_20) {
++                                    RTMP_BBP_IO_WRITE8_BY_REG_ID(pAd, BBP_R196, 0x40);
++                                } else {
++				    RTMP_BBP_IO_WRITE8_BY_REG_ID(pAd, BBP_R196, 0x2F);
++                                }
+ 			}
+ #endif /* DYNAMIC_VGA_SUPPORT */
+ 		}
+Index: mt7620-p4rev-120998/src/include/os/rt_linux_cmm.h
+===================================================================
+--- mt7620-p4rev-120998.orig/src/include/os/rt_linux_cmm.h	2015-03-04 13:40:32.000000000 +0800
++++ mt7620-p4rev-120998/src/include/os/rt_linux_cmm.h	2016-07-28 16:08:15.000000000 +0800
+@@ -400,9 +400,9 @@
+ #define MGMT_RING_SIZE          32
+ #define RX_RING_SIZE            64
+ #else
+-#define TX_RING_SIZE            64 /*64*/
+-#define MGMT_RING_SIZE          128
+-#define RX_RING_SIZE            128 /*64 */
++#define TX_RING_SIZE            128 /*64*/
++#define MGMT_RING_SIZE          256
++#define RX_RING_SIZE            256 /*64 */
+ #endif
+ #define MAX_TX_PROCESS          TX_RING_SIZE /*8 */
+ #define MAX_DMA_DONE_PROCESS    TX_RING_SIZE
+Index: mt7620-p4rev-120998/src/rate_ctrl/alg_legacy.c
+===================================================================
+--- mt7620-p4rev-120998.orig/src/rate_ctrl/alg_legacy.c	2015-03-04 13:40:32.000000000 +0800
++++ mt7620-p4rev-120998/src/rate_ctrl/alg_legacy.c	2016-07-28 16:07:35.000000000 +0800
+@@ -334,8 +334,8 @@
+ 		*/
+ 		if ((Rssi > -65) && (pCurrTxRate->Mode >= MODE_HTMIX))
+ 		{
+-			TrainUp		= (pCurrTxRate->TrainUp + (pCurrTxRate->TrainUp >> 1));
+-			TrainDown	= (pCurrTxRate->TrainDown + (pCurrTxRate->TrainDown >> 1));
++			TrainUp		= (pCurrTxRate->TrainUp + (pCurrTxRate->TrainUp));
++			TrainDown	= (pCurrTxRate->TrainDown + (pCurrTxRate->TrainDown));
+ 		}
+ 		else
+ #endif /* DOT11_N_SUPPORT */
+@@ -633,8 +633,8 @@
+ #ifdef DOT11_N_SUPPORT
+ 		if ((Rssi > -65) && (pCurrTxRate->Mode >= MODE_HTMIX))
+ 		{
+-			TrainUp		= (pCurrTxRate->TrainUp + (pCurrTxRate->TrainUp >> 1));
+-			TrainDown	= (pCurrTxRate->TrainDown + (pCurrTxRate->TrainDown >> 1));
++			TrainUp		= (pCurrTxRate->TrainUp + (pCurrTxRate->TrainUp));
++			TrainDown	= (pCurrTxRate->TrainDown + (pCurrTxRate->TrainDown));
+ 		}
+ 		else
+ #endif /* DOT11_N_SUPPORT */
+Index: mt7620-p4rev-120998/src/rate_ctrl/ra_ctrl.c
+===================================================================
+--- mt7620-p4rev-120998.orig/src/rate_ctrl/ra_ctrl.c	2015-03-04 13:40:32.000000000 +0800
++++ mt7620-p4rev-120998/src/rate_ctrl/ra_ctrl.c	2016-07-28 16:06:17.000000000 +0800
+@@ -183,10 +183,10 @@
+     0x06, 0x21,  3, 15, 35,
+     0x07, 0x21,  4, 15, 30,
+     0x08, 0x20, 11, 15, 30,
+-    0x09, 0x20, 12, 15, 22,
+-    0x0a, 0x20, 13,  8, 20,
+-    0x0b, 0x20, 14,  8, 20,
+-    0x0c, 0x20, 15,  8, 20,
++    0x09, 0x20, 12, 15, 25,
++    0x0a, 0x20, 13, 12, 25,
++    0x0b, 0x20, 14, 12, 25,
++    0x0c, 0x20, 15, 12, 25,
+     0x0d, 0x22, 15,  8, 15,
+ };
+ 

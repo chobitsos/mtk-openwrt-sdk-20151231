@@ -1,0 +1,34 @@
+Index: mt7620-p4rev-120998/src/rate_ctrl/alg_legacy.c
+===================================================================
+--- mt7620-p4rev-120998.orig/src/rate_ctrl/alg_legacy.c	2016-07-28 16:09:14.035199234 +0800
++++ mt7620-p4rev-120998/src/rate_ctrl/alg_legacy.c	2016-07-28 16:10:58.000000000 +0800
+@@ -1724,8 +1724,29 @@
+ #endif /* TXBF_SUPPORT */
+ 		if (CurrRateIdx != DownRateIdx)
+ 		{
++#ifdef FIX_LOWER_RATE_MCS
++                    UCHAR *pTable = pEntry->pTable;
++                    CHAR Rssi;
++                    PRTMP_TX_RATE_SWITCH pCurrTxRate;
++
++                    Rssi = RTMPAvgRssi(pAd, &pEntry->RssiSample);
++                    pCurrTxRate = PTX_RATE_SWITCH_ENTRY(pTable, CurrRateIdx);
++
++
++                    if(Rssi > -60 && pCurrTxRate->CurrMCS == 3)
++                    {
++                        pEntry->LastSecTxRateChangeAction = RATE_NO_CHANGE;
++                    }
++                    else 
++                    {
++                        pEntry->CurrTxRateIndex = DownRateIdx;
++                        pEntry->LastSecTxRateChangeAction = RATE_DOWN;
++                    }
++#else 
++
+ 			pEntry->CurrTxRateIndex = DownRateIdx;
+ 			pEntry->LastSecTxRateChangeAction = RATE_DOWN;
++#endif
+ 		}
+ 	}
+ 	else
