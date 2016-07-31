@@ -167,6 +167,13 @@ if VERSIONOPT
 			If unspecified, it defaults to the svn or git-svn revision
 			of the build tree.
 
+	config VERSION_EXPDATE
+                string
+                prompt "Release version authorization period"
+                help
+                        This is the release version authorization period embedded in the image.
+			 If unspecified, it defaults to the date after 30 days to today.
+
 	config VERSION_REPO
 		string
 		prompt "Release repository"

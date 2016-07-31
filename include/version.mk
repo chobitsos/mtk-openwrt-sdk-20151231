@@ -10,6 +10,7 @@
 
 PKG_CONFIG_DEPENDS += \
 	CONFIG_VERSION_NUMBER \
+        CONFIG_VERSION_EXPDATE \
 	CONFIG_VERSION_NICK \
 	CONFIG_VERSION_REPO \
 	CONFIG_VERSION_DIST \
@@ -19,6 +20,10 @@ PKG_CONFIG_DEPENDS += \
 
 VERSION_NUMBER:=$(call qstrip,$(CONFIG_VERSION_NUMBER))
 VERSION_NUMBER:=$(if $(VERSION_NUMBER),$(VERSION_NUMBER),14.07)
+
+DEF_EXPDATE=$(shell date +%Y%m%d --date='+30 day')
+VERSION_EXPDATE:=$(call qstrip,$(CONFIG_VERSION_EXPDATE))
+VERSION_EXPDATE:=$(if $(VERSION_EXPDATE),$(VERSION_EXPDATE),$(DEF_EXPDATE))
 
 VERSION_CODE:=$(call qstrip,$(CONFIG_VERSION_NUMBER))
 VERSION_CODE:=$(if $(VERSION_CODE),$(VERSION_CODE),Barrier Breaker)
@@ -66,6 +71,7 @@ PKG_CONFIG_DEPENDS += $(foreach taint,$(VERSION_TAINT_SPECS),$(call taint2sym,$(
 
 VERSION_SED:=$(SED) 's,%U,$(VERSION_REPO),g' \
 	-e 's,%V,$(VERSION_NUMBER),g' \
+        -e 's,%A,$(VERSION_EXPDATE),g' \
 	-e 's,%v,\L$(subst $(space),_,$(VERSION_NUMBER)),g' \
 	-e 's,%C,$(VERSION_CODE),g' \
 	-e 's,%c,\L$(subst $(space),_,$(VERSION_CODE)),g' \

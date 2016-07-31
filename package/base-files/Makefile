@@ -112,7 +112,9 @@ define Package/base-files/install
 		$(1)/etc/banner \
 		$(1)/etc/openwrt_version \
 		$(1)/etc/openwrt_release \
-		$(1)/etc/device_info
+		$(1)/etc/device_info \
+		$(1)/etc/info/firm.ver \
+		$(1)/etc/info/exp.date
 
 	mkdir -p $(1)/CONTROL
 	mkdir -p $(1)/dev
