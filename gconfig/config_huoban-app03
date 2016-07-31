@@ -2005,6 +2005,16 @@ CONFIG_PACKAGE_device_auth=y
 # CONFIG_PACKAGE_helloworld-havesrc is not set
 CONFIG_PACKAGE_jarxiutil=y
 CONFIG_PACKAGE_sentry=y
+CONFIG_PACKAGE_squid-jarxi=y
+# CONFIG_PACKAGE_squid-jarxi-mod-basic-auth-getpwnam is not set
+# CONFIG_PACKAGE_squid-jarxi-mod-basic-auth-ncsa is not set
+# CONFIG_PACKAGE_squid-jarxi-mod-basic-auth-smb is not set
+# CONFIG_PACKAGE_squid-jarxi-mod-cachemgr is not set
+# CONFIG_PACKAGE_squid-jarxi-mod-digest-auth-password is not set
+# CONFIG_PACKAGE_squid-jarxi-mod-external-acl-ip-user is not set
+# CONFIG_PACKAGE_squid-jarxi-mod-external-acl-unix-group is not set
+# CONFIG_PACKAGE_squid-jarxi-mod-ntlm-auth-fakeauth is not set
+# CONFIG_PACKAGE_squid-jarxi-mod-ntlm-auth-smb-auth is not set
 CONFIG_PACKAGE_wifidogplus=y
 
 #
