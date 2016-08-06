@@ -3902,6 +3902,9 @@ msgstr "« 后退"
 #~ msgid "Statistics"
 #~ msgstr "统计信息"
 
+msgid "Unauthorized"
+msgstr "未授权"
+
 msgid "ExpDate"
 msgstr "授权期限"
 

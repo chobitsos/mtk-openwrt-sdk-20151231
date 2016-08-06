@@ -85,9 +85,11 @@ Build/Compile = $(Build/Compile/Default)
 define Package/base-files/install
 	$(CP) ./files/* $(1)/
 	if [ -d $(GENERIC_PLATFORM_DIR)/base-files/. ]; then \
+		find $(GENERIC_PLATFORM_DIR)/base-files/. | xargs touch; \
 		$(CP) $(GENERIC_PLATFORM_DIR)/base-files/* $(1)/; \
 	fi
 	if [ -d $(PLATFORM_DIR)/base-files/. ]; then \
+		find $(PLATFORM_DIR)/base-files/. | xargs touch; \
 		$(CP) $(PLATFORM_DIR)/base-files/* $(1)/; \
 	fi
 	if [ -d $(PLATFORM_DIR)/base-files-$(PROFILE)/. ]; then \
