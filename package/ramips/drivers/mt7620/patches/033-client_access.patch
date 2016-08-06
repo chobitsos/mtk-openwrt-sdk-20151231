@@ -1,0 +1,175 @@
+Index: mt7620-p4rev-120998/src/ap/ap_assoc.c
+===================================================================
+--- mt7620-p4rev-120998.orig/src/ap/ap_assoc.c	2016-08-05 22:40:40.513282309 +0800
++++ mt7620-p4rev-120998/src/ap/ap_assoc.c	2016-08-06 08:06:20.254727997 +0800
+@@ -27,6 +27,90 @@
+ 
+ #include "rt_config.h"
+ 
++
++#if defined (CLIENT_ACCESS_SUPPORT)
++#include <net/sock.h>
++#include <linux/netlink.h>
++#include <linux/skbuff.h>
++
++#define NETLINK_GET_CLIENT 30
++#define GET_MAC_ADDR_LEN (18UL)
++static struct sock *nl_get_client = NULL;
++static int get_client_nl_pid = 0;
++static char get_client_msg[128] = {0};
++static char get_client_mac[GET_MAC_ADDR_LEN] = {0};
++const static char *get_client_expect_msg = "get client ";
++
++static int get_client_nl_send_to_user(char *msg)
++{
++    struct nlmsghdr *nlh;
++    struct sk_buff *skb_out;
++    int msg_size;
++    int res;
++
++    if (0 == get_client_nl_pid) {
++        return -1;
++    }
++
++    msg_size=strlen(msg);
++    skb_out = nlmsg_new(msg_size,0);
++
++    if(!skb_out) {
++        printk(KERN_ERR "Failed to allocate new skb\n");
++        return -1;
++    }
++    nlh=nlmsg_put(skb_out,0,0,NLMSG_DONE,msg_size,0);
++    NETLINK_CB(skb_out).dst_group = 0;
++    strncpy(nlmsg_data(nlh),msg,msg_size);
++
++    res=nlmsg_unicast(nl_get_client,skb_out,get_client_nl_pid);
++
++    if(res<0) {
++        printk(KERN_INFO "Error while sending bak to user\n");
++    }
++
++    return res;
++}
++
++static void get_client_nl_recv_msg(struct sk_buff *skb)
++{
++    struct nlmsghdr *nlh;
++
++    //printk(KERN_INFO "Entering: %s\n", __FUNCTION__);
++
++    nlh=(struct nlmsghdr*)skb->data;
++    printk(KERN_INFO "Netlink received msg payload:%s\n",(char*)nlmsg_data(nlh));
++    if (0 != memcmp((char*)nlmsg_data(nlh), get_client_expect_msg, strlen(get_client_expect_msg))) {
++        /* this is not expected message */
++        return;
++    }
++    get_client_nl_pid = nlh->nlmsg_pid;
++}
++
++int get_client_nl_init(void)
++{
++    struct netlink_kernel_cfg cfg = {
++        .input = get_client_nl_recv_msg,
++    };
++
++    printk("Entering: %s\n",__FUNCTION__);
++
++    nl_get_client = netlink_kernel_create(&init_net, NETLINK_GET_CLIENT, &cfg);
++    if(!nl_get_client) {
++        printk(KERN_ALERT "%s: Error creating socket.\n", __FUNCTION__);
++        return -1;
++    }
++
++    return 0;
++}
++
++void get_client_nl_exit(void) {
++	printk("Entering: %s\n",__FUNCTION__);
++	netlink_kernel_release(nl_get_client);
++}
++#endif /* CLIENT_ACCESS_SUPPORT */
++
++
+ static void ap_assoc_info_debugshow(
+ 	IN	PRTMP_ADAPTER		pAd,
+ 	IN	BOOLEAN				isReassoc,
+@@ -321,7 +405,19 @@
+ 
+ 	DBGPRINT(RT_DEBUG_TRACE, ("%s - MBSS(%d), receive %s request from %02x:%02x:%02x:%02x:%02x:%02x\n",
+ 							  sAssoc, pEntry->apidx, sAssoc, PRINT_MAC(Addr2)));
+-    
++
++#if defined (CLIENT_ACCESS_SUPPORT)
++    memset(get_client_mac, 0, sizeof(get_client_msg) / sizeof(get_client_msg[0]));
++    sprintf(get_client_mac, "%02x:%02x:%02x:%02x:%02x:%02x", PRINT_MAC(Addr2));
++
++    printk(KERN_DEBUG"%s get mac %s\n", __FUNCTION__, get_client_mac);
++
++    memset(get_client_msg, 0, sizeof(get_client_msg) / sizeof(get_client_msg[0]));
++    memcpy(get_client_msg, get_client_expect_msg, strlen(get_client_expect_msg));
++    memcpy(get_client_msg + strlen(get_client_expect_msg), get_client_mac, strlen(get_client_mac));
++    get_client_nl_send_to_user(get_client_msg);
++#endif
++
+     /* supported rates array may not be sorted. sort it and find the maximum rate */
+     for (i=0; i<SupportedRatesLen; i++)
+     {
+Index: mt7620-p4rev-120998/build/Kconfig
+===================================================================
+--- mt7620-p4rev-120998.orig/build/Kconfig	2016-08-05 22:40:40.513282309 +0800
++++ mt7620-p4rev-120998/build/Kconfig	2016-08-06 08:05:16.165567460 +0800
+@@ -4,6 +4,11 @@
+ 	select WIRELESS_EXT
+ 	select WEXT_SPY
+ 	select WEXT_PRIV
++
++config RT2860V2_CLIENT_ACCESS
++	bool "get assoc client using netlink"
++	depends on RT2860V2_AP
++	default n
+ 	
+ config RT2860V2_AP_V24_DATA_STRUCTURE
+ 	bool
+Index: mt7620-p4rev-120998/src/common/rtmp_init_inf.c
+===================================================================
+--- mt7620-p4rev-120998.orig/src/common/rtmp_init_inf.c	2016-08-05 22:40:40.513282309 +0800
++++ mt7620-p4rev-120998/src/common/rtmp_init_inf.c	2016-08-06 08:06:27.903729683 +0800
+@@ -1012,6 +1012,13 @@
+ 	/* WSC hardware push button function 0811 */
+ 	WSC_HDR_BTN_Init(pAd);
+ #endif /* WSC_INCLUDED */
++
++#if defined (CLIENT_ACCESS_SUPPORT)
++    extern int get_client_nl_init(void);
++    printk(KERN_ERR"%s: get_client_nl_init\n", __FUNCTION__);
++    get_client_nl_init();
++#endif
++
+ }
+ 
+ 
+@@ -1026,6 +1033,12 @@
+ 
+ 	Cancelled = FALSE;
+ 
++#if defined (CLIENT_ACCESS_SUPPORT)
++    extern int get_client_nl_exit(void);
++    printk(KERN_ERR"%s: get_client_nl_exit\n", __FUNCTION__);
++    get_client_nl_exit();
++#endif
++
+ #ifdef CONFIG_STA_SUPPORT
+ #ifdef CREDENTIAL_STORE
+ 		if (pAd->IndicateMediaState == NdisMediaStateConnected)
+Index: mt7620-p4rev-120998/build/Makefile
+===================================================================
+--- mt7620-p4rev-120998.orig/build/Makefile	2016-08-05 22:40:40.377282308 +0800
++++ mt7620-p4rev-120998/build/Makefile	2016-08-06 08:05:01.345567335 +0800
+@@ -508,3 +508,7 @@
+ endif
+ endif
+ 
++ifeq ($(CONFIG_RT2860V2_CLIENT_ACCESS),y)
++EXTRA_CFLAGS   += -DCLIENT_ACCESS_SUPPORT
++endif
++
