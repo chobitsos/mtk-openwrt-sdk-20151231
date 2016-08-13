@@ -85,11 +85,9 @@ Build/Compile = $(Build/Compile/Default)
 define Package/base-files/install
 	$(CP) ./files/* $(1)/
 	if [ -d $(GENERIC_PLATFORM_DIR)/base-files/. ]; then \
-		find $(GENERIC_PLATFORM_DIR)/base-files/. | xargs touch; \
 		$(CP) $(GENERIC_PLATFORM_DIR)/base-files/* $(1)/; \
 	fi
 	if [ -d $(PLATFORM_DIR)/base-files/. ]; then \
-		find $(PLATFORM_DIR)/base-files/. | xargs touch; \
 		$(CP) $(PLATFORM_DIR)/base-files/* $(1)/; \
 	fi
 	if [ -d $(PLATFORM_DIR)/base-files-$(PROFILE)/. ]; then \
@@ -107,9 +105,12 @@ define Package/base-files/install
 		fi; \
 		if [ -d $(PLATFORM_SUBDIR)/$(PROFILE)/base-files/. ]; then \
 			$(CP) $(PLATFORM_SUBDIR)/$(PROFILE)/base-files/* $(1)/; \
+			rm $(TOPDIR)/files -f; \
+			ln -s -f $(PLATFORM_SUBDIR)/$(PROFILE)/base-files $(TOPDIR)/files; \
 		fi \
 	)
 
+	find $(1)/. | xargs touch;
 	$(VERSION_SED) \
 		$(1)/etc/banner \
 		$(1)/etc/openwrt_version \
