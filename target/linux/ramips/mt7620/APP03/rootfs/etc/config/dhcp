@@ -31,5 +31,5 @@ config dhcp wan
 	option ignore	1
 
 config domain native
-        option name wifi.jarxi.com
+        option name wifi.99zjb.com
         option ip 192.168.99.1

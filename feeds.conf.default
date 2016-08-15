@@ -1,7 +1,4 @@
-src-git jarxipackages ssh://gitolite@192.168.120.7/jarxipackages.git
-#src-git jarxipackages /data/cjp/jarxipackages;debug
-#src-git jarxipackages https://github.com/cjpthree/jarxipackages.git
-
+src-git jarxipackages ssh://gitolite@192.168.120.7/jarxipackages.git;for-app
 src-git packages ssh://gitolite@192.168.120.7/extpackages/packages.git;for-14.07-jarxi
 #src-git luci ssh://gitolite@192.168.120.7/extpackages/luci.git;luci-0.12-jarxi
 src-git routing ssh://gitolite@192.168.120.7/extpackages/routing.git;for-14.07-jarxi

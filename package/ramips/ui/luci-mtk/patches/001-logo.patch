@@ -7,7 +7,7 @@ Index: luci/themes/bootstrap/luasrc/view/themes/bootstrap/header.htm
     <div class="fill">
      <div class="container">
 -     <a class="brand" href="#"><%=hostname%></a>
-+     <a class="brand" href="http://www.baidu.com"><span style="color:yellow;padding-right: 3px;"> APP </span> ROUTER </a>
++     <a class="brand" href="http://www.partners-tech.com.cn/"><span style="color:yellow;padding-right: 3px;"> APP </span> ROUTER </a>
       <ul class="nav">
  	 <%-
  		local function submenu(prefix, node)

@@ -37,21 +37,21 @@ check_file_sys()
 
 update_config()
 {
-    files=/app_control/web/ngnix.pem
+    files=/html/nginx.pem
     if [ -e $files ]; then
-        filed=/etc/ngnix/cert.key
-        stamps=$(get_stamp $files)
-        stampd=$(get_stamp $filed)
+        filed=/etc/nginx/cert.key
+        stamps=1 # $(get_stamp $files)
+        stampd=2 # $(get_stamp $filed)
         echo stamps $stamps stampd $stampd
         if [ $stampd -gt $stamps ]; then
             cp $files $filed
         fi
     fi
-    files=/app_control/web/ngnix.crt
+    files=/html/nginx.crt
     if [ -e $files ]; then
-        filed=/etc/ngnix/cert.crt
-        stamps=$(get_stamp $files)
-        stampd=$(get_stamp $filed)
+        filed=/etc/nginx/cert.crt
+        stamps=1 # $(get_stamp $files)
+        stampd=2 # $(get_stamp $filed)
         echo stamps $stamps stampd $stampd
         if [ $stampd -gt $stamps ]; then
             cp $files $filed
