@@ -22,7 +22,7 @@ enable_mt7620() {
 
 detect_mt7620() {
 #	detect_ralink_wifi mt7620 mt7620
-	ssid=ROUTER-`ifconfig eth0 | grep HWaddr | cut -c 51- | sed 's/://g'`
+	ssid=$(uci get system.@system[0].vendor | tr -d '\n')-`ifconfig eth0 | grep HWaddr | cut -c 51- | sed 's/://g'`
 	cd /sys/module/
 	[ -d $module ] || return
 	[ -e /etc/config/wireless ] && return

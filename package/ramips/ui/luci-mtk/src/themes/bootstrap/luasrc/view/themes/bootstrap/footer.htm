@@ -22,9 +22,16 @@ You may obtain a copy of the License at
 
 	local categories = disp.node_childs(tree)
 %>
-   <footer><a href="http://www.partners-tech.com.cn/"> @2016 版权归厦门伙伴信息技术有限公司所有 </a>
+   <footer><a href="<%=luci.sys.exec("uci get system.@system[0].official | tr -d '\n'")%>"> <%=luci.sys.exec("uci get system.@system[0].company | tr -d '\n'")%> </a>
 
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 热线电话: 400-658-2196
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <script type="text/javascript">
+        hotline='<%=luci.sys.exec("uci get system.@system[0].hotline | tr -d '\n'")%>'
+        if ('' != hotline) {
+            document.write("TEL: ");
+            document.write(hotline);
+        }
+    </script>
 
     <% if #categories > 1 then %>
      <ul class="breadcrumb pull-right" id="modemenu">
