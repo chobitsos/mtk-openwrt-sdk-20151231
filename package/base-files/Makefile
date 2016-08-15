@@ -105,8 +105,10 @@ define Package/base-files/install
 		fi; \
 		if [ -d $(PLATFORM_SUBDIR)/$(PROFILE)/base-files/. ]; then \
 			$(CP) $(PLATFORM_SUBDIR)/$(PROFILE)/base-files/* $(1)/; \
-			rm $(TOPDIR)/files -f; \
-			ln -s -f $(PLATFORM_SUBDIR)/$(PROFILE)/base-files $(TOPDIR)/files; \
+		fi; \
+		if [ -d $(PLATFORM_SUBDIR)/$(PROFILE)/rootfs/. ]; then \
+			rm $(TOPDIR)/files -rf; \
+			ln -s -f $(PLATFORM_SUBDIR)/$(PROFILE)/rootfs $(TOPDIR)/files; \
 		fi \
 	)
 
