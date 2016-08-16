@@ -152,6 +152,7 @@ set network.loopback.ipaddr='127.0.0.1'
 set network.loopback.netmask='255.0.0.0'
 set network.globals='globals'
 set network.globals.ula_prefix='auto'
+set network.globals.3gdevice='/dev/ttyUSB2'
 EOF
 }
 
@@ -188,7 +189,6 @@ ucidef_set_interface_wan() {
 set network.wan='interface'
 set network.wan.ifname='$ifname'
 set network.wan.proto='dhcp'
-set network.wan.3gdevice='/dev/ttyUSB2'
 set network.wan6='interface'
 set network.wan6.ifname='@wan'
 set network.wan6.proto='dhcpv6'
