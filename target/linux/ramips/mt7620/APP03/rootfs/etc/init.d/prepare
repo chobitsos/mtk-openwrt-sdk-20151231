@@ -5,7 +5,7 @@ START=30
 EXTRA_COMMANDS="status"
 EXTRA_HELP="        status Print the status of the service"
 
-appctl_foder='/mnt/mmcblk0p1/app_control'
+appctl_foder='/tmp/mmcblk0/app_control'
 
 get_stamp()
 {
