@@ -1,0 +1,86 @@
+#!/bin/sh /etc/rc.common
+
+START=30
+
+EXTRA_COMMANDS="status"
+EXTRA_HELP="        status Print the status of the service"
+
+appctl_foder='/tmp/mmcblk0/app_control'
+
+get_stamp()
+{
+    timestamp=$(stat $1 | grep -i Modify | awk -F. '{print $1}' | awk '{print $2$3}'| awk -F- '{print $1$2$3}' | awk -F: '{print $1$2$3}')
+    echo -n $timestamp
+}
+
+check_file_sys()
+{
+    if [ ! -e $appctl_foder ]; then
+        mkdir -p $appctl_foder
+    fi
+    if [ ! -e /app_control ]; then
+        ln -s $appctl_foder /app_control
+    fi
+    if [ ! -e /html ]; then
+        ln -s $appctl_foder/web /html
+    fi
+    if [ ! -e /tmp/app_control_applist ]; then
+        ln -s $appctl_foder/app_control_applist /tmp/app_control_applist
+    fi
+    if [ ! -e /tmp/wifidog_client_record ]; then
+        ln -s $appctl_foder/wifidog_client_record /tmp/wifidog_client_record
+    fi
+    if [ ! -e /tmp/wifidog_click_record ]; then
+        ln -s $appctl_foder/wifidog_click_record /tmp/wifidog_click_record
+    fi
+}
+
+update_config()
+{
+    files=/html/nginx.pem
+    if [ -e $files ]; then
+        filed=/etc/nginx/cert.key
+        stamps=1 # $(get_stamp $files)
+        stampd=2 # $(get_stamp $filed)
+        echo stamps $stamps stampd $stampd
+        if [ $stampd -gt $stamps ]; then
+            cp $files $filed
+        fi
+    fi
+    files=/html/nginx.crt
+    if [ -e $files ]; then
+        filed=/etc/nginx/cert.crt
+        stamps=1 # $(get_stamp $files)
+        stampd=2 # $(get_stamp $filed)
+        echo stamps $stamps stampd $stampd
+        if [ $stampd -gt $stamps ]; then
+            cp $files $filed
+        fi
+    fi
+}
+
+prepare()
+{
+    check_file_sys
+    update_config
+}
+
+start() {
+    prepare
+}
+
+stop() {
+	echo "stop"
+}
+
+status() {
+	echo "status"
+}
+
+restart() {
+    prepare
+}
+
+reload() {
+    prepare
+}

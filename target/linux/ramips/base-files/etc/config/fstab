@@ -11,6 +11,7 @@ config 'mount'
         option  enabled '1'
 
 config 'mount'
-        option  target  '/mnt/mmcblk*'
+        option  target  '/tmp/mmcblk0'
+        option  device  '/dev/mmcblk*'
         option  enabled '1'
 

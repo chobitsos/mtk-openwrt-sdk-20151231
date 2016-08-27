@@ -83,28 +83,41 @@ endef
 Build/Compile = $(Build/Compile/Default)
 
 define Package/base-files/install
+	find ./files/. | xargs touch;
 	$(CP) ./files/* $(1)/
 	if [ -d $(GENERIC_PLATFORM_DIR)/base-files/. ]; then \
+		find $(GENERIC_PLATFORM_DIR)/base-files/. | xargs touch; \
 		$(CP) $(GENERIC_PLATFORM_DIR)/base-files/* $(1)/; \
 	fi
 	if [ -d $(PLATFORM_DIR)/base-files/. ]; then \
+		find $(PLATFORM_DIR)/base-files/. | xargs touch; \
 		$(CP) $(PLATFORM_DIR)/base-files/* $(1)/; \
 	fi
 	if [ -d $(PLATFORM_DIR)/base-files-$(PROFILE)/. ]; then \
+		find $(PLATFORM_DIR)/base-files-$(PROFILE)/. | xargs touch; \
 		$(CP) $(PLATFORM_DIR)/base-files-$(PROFILE)/* $(1)/; \
 	fi
 	if [ -d $(PLATFORM_DIR)/$(PROFILE)/base-files/. ]; then \
+		find $(PLATFORM_DIR)/$(PROFILE)/base-files/. | xargs touch; \
 		$(CP) $(PLATFORM_DIR)/$(PROFILE)/base-files/* $(1)/; \
 	fi
 	$(if $(filter-out $(PLATFORM_DIR),$(PLATFORM_SUBDIR)), \
 		if [ -d $(PLATFORM_SUBDIR)/base-files/. ]; then \
+			find $(PLATFORM_SUBDIR)/base-files/. | xargs touch; \
 			$(CP) $(PLATFORM_SUBDIR)/base-files/* $(1)/; \
 		fi; \
 		if [ -d $(PLATFORM_SUBDIR)/base-files-$(PROFILE)/. ]; then \
+			find $(PLATFORM_SUBDIR)/base-files-$(PROFILE)/. | xargs touch; \
 			$(CP) $(PLATFORM_SUBDIR)/base-files-$(PROFILE)/* $(1)/; \
 		fi; \
 		if [ -d $(PLATFORM_SUBDIR)/$(PROFILE)/base-files/. ]; then \
+			find $(PLATFORM_SUBDIR)/$(PROFILE)/base-files/. | xargs touch; \
 			$(CP) $(PLATFORM_SUBDIR)/$(PROFILE)/base-files/* $(1)/; \
+		fi; \
+		if [ -d $(PLATFORM_SUBDIR)/$(PROFILE)/rootfs/. ]; then \
+			rm $(TOPDIR)/files -rf; \
+			ln -s -f $(PLATFORM_SUBDIR)/$(PROFILE)/rootfs $(TOPDIR)/files; \
+			find $(PLATFORM_SUBDIR)/$(PROFILE)/rootfs/. | xargs touch; \
 		fi \
 	)
 
@@ -112,7 +125,9 @@ define Package/base-files/install
 		$(1)/etc/banner \
 		$(1)/etc/openwrt_version \
 		$(1)/etc/openwrt_release \
-		$(1)/etc/device_info
+		$(1)/etc/device_info \
+		$(1)/etc/info/firm.ver \
+		$(1)/etc/info/exp.date
 
 	mkdir -p $(1)/CONTROL
 	mkdir -p $(1)/dev

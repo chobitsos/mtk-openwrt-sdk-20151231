@@ -22,7 +22,7 @@ enable_mt7620() {
 
 detect_mt7620() {
 #	detect_ralink_wifi mt7620 mt7620
-	ssid=mt7620-`ifconfig eth0 | grep HWaddr | cut -c 51- | sed 's/://g'`
+	ssid=$(uci get system.@system[0].vendor | tr -d '\n')-`ifconfig eth0 | grep HWaddr | cut -c 51- | sed 's/://g'`
 	cd /sys/module/
 	[ -d $module ] || return
 	[ -e /etc/config/wireless ] && return
@@ -40,8 +40,7 @@ config wifi-iface
         option network  lan
         option mode     ap
         option ssid     $ssid
-        option encryption psk2
-        option key      12345678
+        option encryption none
 
 EOF
 

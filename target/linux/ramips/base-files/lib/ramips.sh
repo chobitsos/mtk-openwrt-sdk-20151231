@@ -26,6 +26,12 @@ ramips_board_detect() {
 		*"MT7623"*)
 			name="MT7623"
 			;;
+		*"JARXI APP03"*)
+                	name="APP03"
+			;;
+		*"JARXI APP04"*)
+                        name="APP04"
+                	;;
 		*) # actually this is *NOT* acceptable.
 			name="generic"
 			;;

@@ -336,7 +336,7 @@ msgid "Backup / Flash Firmware"
 msgstr "备份/升级"
 
 msgid "Backup / Restore"
-msgstr "备份/恢复"
+msgstr "配置管理"
 
 msgid "Backup file list"
 msgstr "文件备份列表"
@@ -440,7 +440,7 @@ msgid ""
 "Click \"Generate archive\" to download a tar archive of the current "
 "configuration files. To reset the firmware to its initial state, click "
 "\"Perform reset\" (only possible with squashfs images)."
-msgstr "备份/恢复当前系统配置文件或重置OpenWrt(仅squashfs固件有效)。"
+msgstr "重置OpenWrt(仅squashfs固件有效)。"
 
 msgid "Client"
 msgstr "客户端Client"
@@ -3901,3 +3901,10 @@ msgstr "« 后退"
 
 #~ msgid "Statistics"
 #~ msgstr "统计信息"
+
+msgid "Unauthorized"
+msgstr "未授权"
+
+msgid "ExpDate"
+msgstr "授权期限"
+

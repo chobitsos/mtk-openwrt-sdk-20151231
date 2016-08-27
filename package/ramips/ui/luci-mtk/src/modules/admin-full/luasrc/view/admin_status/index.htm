@@ -563,9 +563,23 @@ You may obtain a copy of the License at
 		<tr><td width="33%"><%:Hostname%></td><td><%=luci.sys.hostname() or "?"%></td></tr>
 		<tr><td width="33%"><%:Model%></td><td><%=pcdata(model or "?")%></td></tr>
 		<tr><td width="33%"><%:Firmware Version%></td><td>
-			<%=pcdata(luci.version.distname)%> <%=pcdata(luci.version.distversion)%> /
-			<%=pcdata(luci.version.luciname)%> (<%=pcdata(luci.version.luciversion)%>)
+			<%=luci.sys.exec("jarxi.sh get_ver")%>
 		</td></tr>
+        <tr>
+          <td width="33%"><%:ExpDate%></td>
+          <td>
+            <script type="text/javascript">
+              device_auth = '<%=luci.sys.exec("jarxi.sh get_auth")%>'
+              if ('' == device_auth) {
+                document.write("...");
+              } else if (1 == device_auth) {
+                document.write("<%=luci.sys.exec("jarxi.sh get_expdate")%>");
+              } else {
+                document.write("<%:Unauthorized%>");
+              }
+            </script>
+          </td>
+        </tr>
 		<tr><td width="33%"><%:Kernel Version%></td><td><%=luci.sys.exec("uname -r")%></td></tr>
 		<tr><td width="33%"><%:Local Time%></td><td id="localtime">-</td></tr>
 		<tr><td width="33%"><%:Uptime%></td><td id="uptime">-</td></tr>
