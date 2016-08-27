@@ -1,5 +1,5 @@
 config system
-	option hostname	XMHB-ROUTER
+	option hostname	XMHB-WIFI
 	option timezone	CST-8
 	option zonename Asia/Shanghai
 	option darkmark	jarxi
