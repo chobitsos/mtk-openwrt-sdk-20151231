@@ -200,7 +200,8 @@ ramips_setup_interfaces()
 	MT7620 | MT7628 | MT7688)
 		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
 		;;
-	APP03)
+	APP03 | \
+	APP04)
                 ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
                 ;;
 	MT7621 | MT7623)
@@ -299,7 +300,8 @@ ramips_setup_macs()
 		lan_mac=$(eth_mac r lan)
 		wan_mac=$(eth_mac r wan)
 		;;
-	APP03)
+	APP03 | \
+	APP04)
                 lan_mac=$(eth_mac r lan)
                 wan_mac=$(eth_mac r wan)
                 ;;
